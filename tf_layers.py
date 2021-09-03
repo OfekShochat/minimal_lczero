@@ -31,6 +31,38 @@ class SqueezeExcitation(tf.keras.layers.Layer):
         return gammas * inputs + betas
 
 
+class StochaticConv2d(tf.keras.layers.Layer):
+    def __init__(self, filter_size, output_channels, l2_reg, name, bn_scale, survival=0.25):
+        super().__init__()
+        if l2_reg is None or l2_reg == 0:
+            regularizer = None
+        else:
+            regularizer = tf.keras.regularizers.L2(l2_reg)
+        self.conv_layer = tf.keras.layers.Conv2D(output_channels, filter_size, use_bias=False,
+                                                 padding='same',
+                                                 kernel_initializer='glorot_normal',
+                                                 kernel_regularizer=regularizer,
+                                                 data_format='channels_first',
+                                                 name=name + '/conv2d'
+                                                 )
+        self.batchnorm = tf.keras.layers.BatchNormalization(
+            epsilon=1e-5,
+            axis=1,
+            center=True,
+            scale=bn_scale,
+            name=name + '/batchnorm')
+        self.survival = survival
+
+    def conv_call(self, inputs):
+        out = self.conv_layer(inputs)
+        out = self.batchnorm(out)
+        return tf.keras.activations.relu(out)
+
+    def call(self, inputs, **kwargs):
+        coin_toss = tf.random.uniform(())
+        return tf.cond(tf.greater(self.survival, coin_toss), lambda: inputs, lambda: self.conv_call(inputs))
+
+
 class ConvBlock(tf.keras.layers.Layer):
     def __init__(self, filter_size, output_channels, l2_reg, name, bn_scale):
         super().__init__()
