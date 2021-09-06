@@ -55,13 +55,20 @@ here yet, unfortunately!
 
 ### How do I actually run training?
 
-Just run `tf_train.py`! You'll need a dataset, though - I'm working on that bit.
+Just run `tf_train.py`! You'll need a dataset, though - I'm working on that bit. In the meantime, people familiar
+with Leela can use any directory of v6 chunks.
+
+### How do I run PyTorch training?
+
+Just run `pt_train.py`! It takes the same arguments as `tf_train.py`, but training seems slower right now 
+in terms of both epoch speed and iterations to achieve the same loss. I suspect there are a couple of bugs
+or layers that aren't quite equivalent in there still, but I'm working on it!
 
 ### Roadmap for this repo
 
 Right now this repo is very unfinished, but the rough plan is:
 
 1) Verify that our training matches the original repo and no bugs have snuck in.
-2) Add model checkpointing and Tensorboard logging.
-3) Build a standard dataset and validation set and host it somewhere accessible. Also build a smaller dataset that people can experiment with without having to download the whole training set.
-4) Add PyTorch versions of everything.
+2) Verify that PyTorch training also matches.
+3) Add model checkpointing and Tensorboard logging.
+4) Build a standard dataset and validation set and host it somewhere accessible. Also build a smaller dataset that people can experiment with without having to download the whole training set.
